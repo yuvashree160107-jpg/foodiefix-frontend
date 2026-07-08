@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FoodieFix Dashboard — Manage menu, tables, reservations and orders">
+    <title>FoodieFix — Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ======================== TOAST CONTAINER ======================== -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ======================== APP LAYOUT ======================== -->
+<div class="app-layout">
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="logo-icon">🍽️</span>
+            <h2>FoodieFix</h2>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Main</div>
+            <button class="nav-item active" data-section="dashboard" id="nav-dashboard">
+                <span class="nav-icon">📊</span> Dashboard
+            </button>
+
+            <div class="nav-section-title">Management</div>
+            <button class="nav-item" data-section="menu" id="nav-menu">
+                <span class="nav-icon">📋</span> Menu Items
+            </button>
+            <button class="nav-item" data-section="tables" id="nav-tables">
+                <span class="nav-icon">🪑</span> Tables
+            </button>
+            <button class="nav-item" data-section="reservations" id="nav-reservations">
+                <span class="nav-icon">📅</span> Reservations
+            </button>
+            <button class="nav-item" data-section="orders" id="nav-orders">
+                <span class="nav-icon">🧾</span> Orders
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar" id="user-avatar">U</div>
+                <div class="user-info">
+                    <div class="user-name" id="sidebar-user-name">User</div>
+                    <div class="user-role" id="sidebar-user-role">Role</div>
+                </div>
+            </div>
+            <button class="nav-item" id="logout-btn" style="margin-top: 0.5rem; color: var(--danger);">
+                <span class="nav-icon">🚪</span> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="main-content">
+
+        <!-- ========== SECTION: DASHBOARD ========== -->
+        <div class="section active" id="section-dashboard">
+            <div class="page-header">
+                <div>
+                    <h1>Welcome back, <span id="welcome-name">User</span> 👋</h1>
+                    <p>Here's what's happening in your restaurant today.</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon amber">📋</div>
+                    <div>
+                        <div class="stat-value" id="stat-menu">—</div>
+                        <div class="stat-label">Menu Items</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">🪑</div>
+                    <div>
+                        <div class="stat-value" id="stat-tables">—</div>
+                        <div class="stat-label">Tables</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">📅</div>
+                    <div>
+                        <div class="stat-value" id="stat-reservations">—</div>
+                        <div class="stat-label">Reservations</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">🧾</div>
+                    <div>
+                        <div class="stat-value" id="stat-orders">—</div>
+                        <div class="stat-label">Total Orders</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== SECTION: MENU ========== -->
+        <div class="section" id="section-menu">
+            <div class="page-header">
+                <div>
+                    <h1>Menu Items</h1>
+                    <p>Manage your restaurant's menu offerings</p>
+                </div>
+                <button class="btn btn-primary" id="btn-show-add-menu">+ Add Item</button>
+            </div>
+
+            <!-- Add Menu Item Panel -->
+            <div class="panel" id="panel-add-menu" style="display:none;">
+                <div class="panel-header">
+                    <h3>➕ New Menu Item</h3>
+                    <button class="btn btn-sm btn-ghost" id="btn-hide-add-menu">✕ Cancel</button>
+                </div>
+                <div class="panel-body">
+                    <form id="menu-form" class="inline-form">
+                        <div class="form-group">
+                            <label for="menu-name">Name</label>
+                            <input type="text" id="menu-name" class="form-control" placeholder="Dish name" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="menu-price">Base Price</label>
+                            <input type="number" id="menu-price" class="form-control" placeholder="0.00" step="0.01" min="0" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="menu-category">Category</label>
+                            <select id="menu-category" class="form-control">
+                                <option value="APPETIZER">Appetizer</option>
+                                <option value="MAIN_COURSE">Main Course</option>
+                                <option value="DESSERT">Dessert</option>
+                                <option value="BEVERAGE">Beverage</option>
+                                <option value="SIDES">Sides</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="menu-available">Available</label>
+                            <select id="menu-available" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Save Item</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Menu Table -->
+            <div class="panel">
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Category</th>
+                                <th>Available</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menu-tbody">
+                            <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📋</div><p>Loading menu items...</p></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== SECTION: TABLES ========== -->
+        <div class="section" id="section-tables">
+            <div class="page-header">
+                <div>
+                    <h1>Restaurant Tables</h1>
+                    <p>Manage table layout and availability</p>
+                </div>
+                <button class="btn btn-primary" id="btn-show-add-table">+ Add Table</button>
+            </div>
+
+            <!-- Add Table Panel -->
+            <div class="panel" id="panel-add-table" style="display:none;">
+                <div class="panel-header">
+                    <h3>➕ New Table</h3>
+                    <button class="btn btn-sm btn-ghost" id="btn-hide-add-table">✕ Cancel</button>
+                </div>
+                <div class="panel-body">
+                    <form id="table-form" class="inline-form">
+                        <div class="form-group">
+                            <label for="table-number">Table Number</label>
+                            <input type="number" id="table-number" class="form-control" placeholder="e.g. 1" min="1" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="table-capacity">Seating Capacity</label>
+                            <input type="number" id="table-capacity" class="form-control" placeholder="e.g. 4" min="1" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="table-status">Status</label>
+                            <select id="table-status" class="form-control">
+                                <option value="AVAILABLE">Available</option>
+                                <option value="OCCUPIED">Occupied</option>
+                                <option value="RESERVED">Reserved</option>
+                                <option value="OUT_OF_SERVICE">Out of Service</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="table-active">Active</label>
+                            <select id="table-active" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Save Table</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tables Table -->
+            <div class="panel">
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Table #</th>
+                                <th>Capacity</th>
+                                <th>Status</th>
+                                <th>Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tables-tbody">
+                            <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🪑</div><p>Loading tables...</p></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== SECTION: RESERVATIONS ========== -->
+        <div class="section" id="section-reservations">
+            <div class="page-header">
+                <div>
+                    <h1>Reservations</h1>
+                    <p>Manage guest bookings and seating</p>
+                </div>
+                <button class="btn btn-primary" id="btn-show-add-reservation">+ New Reservation</button>
+            </div>
+
+            <!-- Add Reservation Panel -->
+            <div class="panel" id="panel-add-reservation" style="display:none;">
+                <div class="panel-header">
+                    <h3>➕ New Reservation</h3>
+                    <button class="btn btn-sm btn-ghost" id="btn-hide-add-reservation">✕ Cancel</button>
+                </div>
+                <div class="panel-body">
+                    <form id="reservation-form" class="inline-form">
+                        <div class="form-group">
+                            <label for="res-customer-name">Customer Name</label>
+                            <input type="text" id="res-customer-name" class="form-control" placeholder="Full name" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="res-customer-phone">Phone Number</label>
+                            <input type="tel" id="res-customer-phone" class="form-control" placeholder="+91 98765 43210" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="res-table-id">Table ID</label>
+                            <input type="number" id="res-table-id" class="form-control" placeholder="Table ID" min="1" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="res-time">Reservation Time</label>
+                            <input type="datetime-local" id="res-time" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="res-guests">Guest Count</label>
+                            <input type="number" id="res-guests" class="form-control" placeholder="e.g. 4" min="1" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Book</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Reservations Table -->
+            <div class="panel">
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Phone</th>
+                                <th>Table</th>
+                                <th>Time</th>
+                                <th>Guests</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reservations-tbody">
+                            <tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📅</div><p>Loading reservations...</p></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== SECTION: ORDERS ========== -->
+        <div class="section" id="section-orders">
+            <div class="page-header">
+                <div>
+                    <h1>Orders</h1>
+                    <p>Place and manage dining orders</p>
+                </div>
+                <button class="btn btn-primary" id="btn-show-place-order">+ Place Order</button>
+            </div>
+
+            <!-- Place Order Panel -->
+            <div class="panel" id="panel-place-order" style="display:none;">
+                <div class="panel-header">
+                    <h3>🧾 Place New Order</h3>
+                    <button class="btn btn-sm btn-ghost" id="btn-hide-place-order">✕ Cancel</button>
+                </div>
+                <div class="panel-body">
+                    <form id="order-form">
+                        <div class="form-group" style="max-width: 200px;">
+                            <label for="order-table-id">Table ID</label>
+                            <input type="number" id="order-table-id" class="form-control" placeholder="Table ID" min="1" required />
+                        </div>
+
+                        <div class="nav-section-title" style="padding-left:0; margin-top:1rem;">Order Items</div>
+                        <div id="order-items-container">
+                            <!-- Dynamic item rows will be added here -->
+                        </div>
+                        <button type="button" class="btn btn-sm btn-ghost" id="btn-add-order-item" style="margin-top:0.5rem;">+ Add Item</button>
+
+                        <div style="margin-top: 1.25rem;">
+                            <button type="submit" class="btn btn-primary">Place Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Update Order Status Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>🔄 Update Order Status</h3>
+                </div>
+                <div class="panel-body">
+                    <form id="order-status-form" class="inline-form">
+                        <div class="form-group">
+                            <label for="status-order-id">Order ID</label>
+                            <input type="number" id="status-order-id" class="form-control" placeholder="Order ID" min="1" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="status-value">New Status</label>
+                            <select id="status-value" class="form-control">
+                                <option value="PLACED">Placed</option>
+                                <option value="PREPARING">Preparing</option>
+                                <option value="READY">Ready</option>
+                                <option value="PAID">Paid</option>
+                                <option value="CANCELLED">Cancelled</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Order Result -->
+            <div class="panel" id="order-result-panel" style="display:none;">
+                <div class="panel-header">
+                    <h3>✅ Order Details</h3>
+                </div>
+                <div class="panel-body" id="order-result-body"></div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ======================== JAVASCRIPT ======================== -->
+<script>
+(function() {
+    'use strict';
+
+    const API_BASE = 'https://foodiefix-backend-2.onrender.com';
+
+    // ---- Auth Guard ----
+    const token    = localStorage.getItem('jwt_token');
+    const fullName = localStorage.getItem('user_fullName') || 'User';
+    const role     = localStorage.getItem('user_role') || '';
+    const username = localStorage.getItem('user_username') || '';
+
+    if (!token) {
+        window.location.href = 'login.html';
+    }
+
+    // ---- Populate user info ----
+    document.getElementById('welcome-name').textContent = fullName;
+    document.getElementById('sidebar-user-name').textContent = fullName;
+    document.getElementById('sidebar-user-role').textContent = role.replace(/_/g, ' ');
+    document.getElementById('user-avatar').textContent = fullName.charAt(0).toUpperCase();
+
+    // ---- Auth headers helper ----
+    function authHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        };
+    }
+
+    // ---- Toast ----
+    function showToast(message, type) {
+        var container = document.getElementById('toast-container');
+        var toast = document.createElement('div');
+        toast.className = 'toast toast-' + type;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(function() {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(40px)';
+            toast.style.transition = '0.3s ease';
+            setTimeout(function() { toast.remove(); }, 300);
+        }, 3500);
+    }
+
+    // ---- Navigation ----
+    var navItems = document.querySelectorAll('.nav-item[data-section]');
+    navItems.forEach(function(item) {
+        item.addEventListener('click', function() {
+            var sectionId = this.getAttribute('data-section');
+            // Remove active from all
+            navItems.forEach(function(n) { n.classList.remove('active'); });
+            document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+            // Activate
+            this.classList.add('active');
+            document.getElementById('section-' + sectionId).classList.add('active');
+            // Load data
+            if (sectionId === 'menu') loadMenu();
+            if (sectionId === 'tables') loadTables();
+            if (sectionId === 'reservations') loadReservations();
+            if (sectionId === 'dashboard') loadDashboardStats();
+        });
+    });
+
+    // ---- Logout ----
+    document.getElementById('logout-btn').addEventListener('click', function() {
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('user_username');
+        localStorage.removeItem('user_role');
+        localStorage.removeItem('user_fullName');
+        window.location.href = 'login.html';
+    });
+
+    // ---- Toggle Panels ----
+    function setupToggle(showId, hideId, panelId) {
+        document.getElementById(showId).addEventListener('click', function() {
+            document.getElementById(panelId).style.display = 'block';
+        });
+        document.getElementById(hideId).addEventListener('click', function() {
+            document.getElementById(panelId).style.display = 'none';
+        });
+    }
+    setupToggle('btn-show-add-menu', 'btn-hide-add-menu', 'panel-add-menu');
+    setupToggle('btn-show-add-table', 'btn-hide-add-table', 'panel-add-table');
+    setupToggle('btn-show-add-reservation', 'btn-hide-add-reservation', 'panel-add-reservation');
+    setupToggle('btn-show-place-order', 'btn-hide-place-order', 'panel-place-order');
+
+    // ---- Badge helper ----
+    function statusBadge(status) {
+        var map = {
+            'AVAILABLE': 'success', 'OCCUPIED': 'warning', 'RESERVED': 'info', 'OUT_OF_SERVICE': 'danger',
+            'BOOKED': 'info', 'SEATED': 'success', 'CANCELLED': 'danger',
+            'PLACED': 'info', 'PREPARING': 'warning', 'READY': 'success', 'PAID': 'neutral',
+            'APPETIZER': 'info', 'MAIN_COURSE': 'success', 'DESSERT': 'warning', 'BEVERAGE': 'info', 'SIDES': 'neutral'
+        };
+        var cls = map[status] || 'neutral';
+        return '<span class="badge badge-' + cls + '">' + (status || '—').replace(/_/g, ' ') + '</span>';
+    }
+
+    // ============================================================
+    //  MENU
+    // ============================================================
+    async function loadMenu() {
+        try {
+            var res = await fetch(API_BASE + '/api/menu', { headers: authHeaders() });
+            var items = await res.json();
+            var tbody = document.getElementById('menu-tbody');
+            if (!items.length) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📋</div><p>No menu items yet. Add your first dish!</p></div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = items.map(function(item) {
+                return '<tr>' +
+                    '<td>' + item.id + '</td>' +
+                    '<td><strong>' + item.name + '</strong></td>' +
+                    '<td>₹' + (item.basePrice != null ? item.basePrice.toFixed(2) : '0.00') + '</td>' +
+                    '<td>' + statusBadge(item.category) + '</td>' +
+                    '<td>' + (item.isAvailable ? '<span class="badge badge-success">Yes</span>' : '<span class="badge badge-danger">No</span>') + '</td>' +
+                    '<td><div class="action-btns"><button class="btn btn-sm btn-danger" onclick="deleteMenuItem(' + item.id + ')">Delete</button></div></td>' +
+                    '</tr>';
+            }).join('');
+        } catch (err) {
+            showToast('Failed to load menu: ' + err.message, 'error');
+        }
+    }
+
+    window.deleteMenuItem = async function(id) {
+        if (!confirm('Delete menu item #' + id + '?')) return;
+        try {
+            await fetch(API_BASE + '/api/menu/' + id, { method: 'DELETE', headers: authHeaders() });
+            showToast('Menu item deleted successfully', 'success');
+            loadMenu();
+        } catch (err) {
+            showToast('Failed to delete: ' + err.message, 'error');
+        }
+    };
+
+    document.getElementById('menu-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var payload = {
+            name: document.getElementById('menu-name').value.trim(),
+            basePrice: parseFloat(document.getElementById('menu-price').value),
+            category: document.getElementById('menu-category').value,
+            isAvailable: document.getElementById('menu-available').value === 'true'
+        };
+        try {
+            var res = await fetch(API_BASE + '/api/menu', {
+                method: 'POST', headers: authHeaders(), body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                showToast('Menu item added!', 'success');
+                this.reset();
+                document.getElementById('panel-add-menu').style.display = 'none';
+                loadMenu();
+            } else {
+                var data = await res.json().catch(function() { return {}; });
+                showToast(data.message || 'Failed to add menu item', 'error');
+            }
+        } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+        }
+    });
+
+    // ============================================================
+    //  TABLES
+    // ============================================================
+    async function loadTables() {
+        try {
+            var res = await fetch(API_BASE + '/api/tables?page=0&size=100', { headers: authHeaders() });
+            var data = await res.json();
+            var items = data.content || [];
+            var tbody = document.getElementById('tables-tbody');
+            if (!items.length) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🪑</div><p>No tables configured yet.</p></div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = items.map(function(t) {
+                return '<tr>' +
+                    '<td>' + t.id + '</td>' +
+                    '<td><strong>Table ' + t.tableNumber + '</strong></td>' +
+                    '<td>' + t.seatingCapacity + ' seats</td>' +
+                    '<td>' + statusBadge(t.status) + '</td>' +
+                    '<td>' + (t.isActive ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>') + '</td>' +
+                    '<td><div class="action-btns">' +
+                        '<select class="form-control" style="width:auto;padding:0.3rem 0.5rem;font-size:0.78rem;" onchange="updateTableStatus(' + t.id + ', this.value)">' +
+                            '<option value="">Change status</option>' +
+                            '<option value="AVAILABLE">Available</option>' +
+                            '<option value="OCCUPIED">Occupied</option>' +
+                            '<option value="RESERVED">Reserved</option>' +
+                            '<option value="OUT_OF_SERVICE">Out of Service</option>' +
+                        '</select>' +
+                        '<button class="btn btn-sm btn-danger" onclick="deleteTable(' + t.id + ')">Delete</button>' +
+                    '</div></td>' +
+                    '</tr>';
+            }).join('');
+        } catch (err) {
+            showToast('Failed to load tables: ' + err.message, 'error');
+        }
+    }
+
+    window.updateTableStatus = async function(id, status) {
+        if (!status) return;
+        try {
+            var res = await fetch(API_BASE + '/api/tables/' + id + '/status?status=' + status, {
+                method: 'PATCH', headers: authHeaders()
+            });
+            if (res.ok) {
+                showToast('Table status updated', 'success');
+                loadTables();
+            } else {
+                var data = await res.json().catch(function() { return {}; });
+                showToast(data.message || 'Failed to update status', 'error');
+            }
+        } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+        }
+    };
+
+    window.deleteTable = async function(id) {
+        if (!confirm('Delete table #' + id + '?')) return;
+        try {
+            await fetch(API_BASE + '/api/tables/' + id, { method: 'DELETE', headers: authHeaders() });
+            showToast('Table deleted', 'success');
+            loadTables();
+        } catch (err) {
+            showToast('Failed to delete: ' + err.message, 'error');
+        }
+    };
+
+    document.getElementById('table-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var payload = {
+            tableNumber: parseInt(document.getElementById('table-number').value),
+            seatingCapacity: parseInt(document.getElementById('table-capacity').value),
+            status: document.getElementById('table-status').value,
+            isActive: document.getElementById('table-active').value === 'true'
+        };
+        try {
+            var res = await fetch(API_BASE + '/api/tables', {
+                method: 'POST', headers: authHeaders(), body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                showToast('Table added!', 'success');
+                this.reset();
+                document.getElementById('panel-add-table').style.display = 'none';
+                loadTables();
+            } else {
+                var data = await res.json().catch(function() { return {}; });
+                showToast(data.message || 'Failed to add table', 'error');
+            }
+        } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+        }
+    });
+
+    // ============================================================
+    //  RESERVATIONS
+    // ============================================================
+    async function loadReservations() {
+        try {
+            var res = await fetch(API_BASE + '/api/reservations?page=0&size=100', { headers: authHeaders() });
+            var data = await res.json();
+            var items = data.content || [];
+            var tbody = document.getElementById('reservations-tbody');
+            if (!items.length) {
+                tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📅</div><p>No reservations found.</p></div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = items.map(function(r) {
+                var time = r.reservationTime ? new Date(r.reservationTime).toLocaleString() : '—';
+                var actions = '';
+                if (r.status === 'BOOKED') {
+                    actions = '<button class="btn btn-sm btn-success" onclick="seatReservation(' + r.id + ')">Seat</button>' +
+                              '<button class="btn btn-sm btn-danger" onclick="cancelReservation(' + r.id + ')">Cancel</button>';
+                } else if (r.status === 'SEATED') {
+                    actions = '<span class="badge badge-success">Seated</span>';
+                } else {
+                    actions = '<span class="badge badge-danger">Cancelled</span>';
+                }
+                return '<tr>' +
+                    '<td>' + r.id + '</td>' +
+                    '<td><strong>' + (r.customerName || '—') + '</strong></td>' +
+                    '<td>' + (r.customerPhoneNumber || r.customerPhone || '—') + '</td>' +
+                    '<td>' + (r.table_id || r.tableId || '—') + '</td>' +
+                    '<td>' + time + '</td>' +
+                    '<td>' + (r.guestCount || '—') + '</td>' +
+                    '<td>' + statusBadge(r.status) + '</td>' +
+                    '<td><div class="action-btns">' + actions + '</div></td>' +
+                    '</tr>';
+            }).join('');
+        } catch (err) {
+            showToast('Failed to load reservations: ' + err.message, 'error');
+        }
+    }
+
+    window.seatReservation = async function(id) {
+        try {
+            var res = await fetch(API_BASE + '/api/reservations/' + id + '/seat', {
+                method: 'PATCH', headers: authHeaders()
+            });
+            if (res.ok) {
+                showToast('Guest seated!', 'success');
+                loadReservations();
+            } else {
+                var data = await res.json().catch(function() { return {}; });
+                showToast(data.message || 'Failed to seat guest', 'error');
+            }
+        } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+        }
+    };
+
+    window.cancelReservation = async function(id) {
+        if (!confirm('Cancel reservation #' + id + '?')) return;
+        try {
+            await fetch(API_BASE + '/api/reservations/' + id, { method: 'DELETE', headers: authHeaders() });
+            showToast('Reservation cancelled', 'success');
+            loadReservations();
+        } catch (err) {
+            showToast('Failed to cancel: ' + err.message, 'error');
+        }
+    };
+
+    document.getElementById('reservation-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        // Payload matches ReservationRequestDto
+        var payload = {
+            customerName: document.getElementById('res-customer-name').value.trim(),
+            customerPhone: document.getElementById('res-customer-phone').value.trim(),
+            tableId: parseInt(document.getElementById('res-table-id').value),
+            reservationTime: document.getElementById('res-time').value + ':00',
+            guestCount: parseInt(document.getElementById('res-guests').value)
+        };
+        try {
+            var res = await fetch(API_BASE + '/api/reservations', {
+                method: 'POST', headers: authHeaders(), body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                showToast('Reservation created!', 'success');
+                this.reset();
+                document.getElementById('panel-add-reservation').style.display = 'none';
+                loadReservations();
+            } else {
+                var data = await res.json().catch(function() { return {}; });
+                showToast(data.message || 'Failed to create reservation', 'error');
+            }
+        } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+        }
+    });
+
+    // ============================================================
+    //  ORDERS
+    // ============================================================
+    // Dynamic order items
+    var orderItemIndex = 0;
+    function addOrderItemRow() {
+        orderItemIndex++;
+        var container = document.getElementById('order-items-container');
+        var row = document.createElement('div');
+        row.className = 'order-item-row';
+        row.id = 'order-item-' + orderItemIndex;
+        row.innerHTML =
+            '<div class="form-group">' +
+                '<label>Menu Item ID</label>' +
+                '<input type="number" class="form-control oi-menu-id" placeholder="ID" min="1" required />' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label>Quantity</label>' +
+                '<input type="number" class="form-control oi-qty" placeholder="Qty" min="1" value="1" required />' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label>Special Notes</label>' +
+                '<input type="text" class="form-control oi-notes" placeholder="Optional" />' +
+            '</div>' +
+            '<button type="button" class="btn btn-sm btn-danger btn-remove" onclick="this.parentElement.remove()">✕</button>';
+        container.appendChild(row);
+    }
+
+    document.getElementById('btn-add-order-item').addEventListener('click', addOrderItemRow);
+    // Start with one row
+    addOrderItemRow();
+
+    document.getElementById('order-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var tableId = parseInt(document.getElementById('order-table-id').value);
+        var rows = document.querySelectorAll('.order-item-row');
+        var items = [];
+        rows.forEach(function(row) {
+            var menuItemId = parseInt(row.querySelector('.oi-menu-id').value);
+            var quantity = parseInt(row.querySelector('.oi-qty').value);
+            var specialNotes = row.querySelector('.oi-notes').value.trim();
+            if (menuItemId && quantity) {
+                items.push({ menuItemId: menuItemId, quantity: quantity, specialNotes: specialNotes });
+            }
+        });
+        if (!items.length) {
+            showToast('Please add at least one item', 'error');
+            return;
+        }
+        // Payload matches OrderRequestDto
+        var payload = { tableId: tableId, items: items };
+        try {
+            var res = await fetch(API_BASE + '/api/orders', {
+                method: 'POST', headers: authHeaders(), body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                var order = await res.json();
+                showToast('Order #' + order.id + ' placed successfully!', 'success');
+                // Show result
+                var resultPanel = document.getElementById('order-result-panel');
+                resultPanel.style.display = 'block';
+                document.getElementById('order-result-body').innerHTML =
+                    '<p><strong>Order ID:</strong> ' + order.id + '</p>' +
+                    '<p><strong>Table:</strong> ' + (order.table_id || order.tableId || tableId) + '</p>' +
+                    '<p><strong>Status:</strong> ' + statusBadge(order.status) + '</p>' +
+                    '<p><strong>Total:</strong> ₹' + (order.totalAmount != null ? order.totalAmount.toFixed(2) : '0.00') + '</p>';
+                this.reset();
+                document.getElementById('order-items-container').innerHTML = '';
+                addOrderItemRow();
+                document.getElementById('panel-place-order').style.display = 'none';
+            } else {
+                var data = await res.json().catch(function() { return {}; });
+                showToast(data.message || 'Failed to place order', 'error');
+            }
+        } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+        }
+    });
+
+    document.getElementById('order-status-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var orderId = document.getElementById('status-order-id').value;
+        var status = document.getElementById('status-value').value;
+        try {
+            var res = await fetch(API_BASE + '/api/orders/' + orderId + '/status?status=' + status, {
+                method: 'PATCH', headers: authHeaders()
+            });
+            if (res.ok) {
+                var order = await res.json();
+                showToast('Order #' + orderId + ' updated to ' + status, 'success');
+                var resultPanel = document.getElementById('order-result-panel');
+                resultPanel.style.display = 'block';
+                document.getElementById('order-result-body').innerHTML =
+                    '<p><strong>Order ID:</strong> ' + order.id + '</p>' +
+                    '<p><strong>Status:</strong> ' + statusBadge(order.status) + '</p>' +
+                    '<p><strong>Total:</strong> ₹' + (order.totalAmount != null ? order.totalAmount.toFixed(2) : '0.00') + '</p>';
+            } else {
+                var data = await res.json().catch(function() { return {}; });
+                showToast(data.message || 'Failed to update order', 'error');
+            }
+        } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+        }
+    });
+
+    // ============================================================
+    //  DASHBOARD STATS
+    // ============================================================
+    async function loadDashboardStats() {
+        try {
+            // Menu count
+            var menuRes = await fetch(API_BASE + '/api/menu', { headers: authHeaders() });
+            if (menuRes.ok) {
+                var menu = await menuRes.json();
+                document.getElementById('stat-menu').textContent = menu.length;
+            }
+        } catch (e) { /* ignore */ }
+
+        try {
+            // Tables count
+            var tablesRes = await fetch(API_BASE + '/api/tables?page=0&size=1', { headers: authHeaders() });
+            if (tablesRes.ok) {
+                var tablesData = await tablesRes.json();
+                document.getElementById('stat-tables').textContent = tablesData.totalElements || 0;
+            }
+        } catch (e) { /* ignore */ }
+
+        try {
+            // Reservations count
+            var resRes = await fetch(API_BASE + '/api/reservations?page=0&size=1', { headers: authHeaders() });
+            if (resRes.ok) {
+                var resData = await resRes.json();
+                document.getElementById('stat-reservations').textContent = resData.totalElements || 0;
+            }
+        } catch (e) { /* ignore */ }
+
+        // Orders — no list endpoint, show "—"
+        document.getElementById('stat-orders').textContent = '—';
+    }
+
+    // ---- Initial load ----
+    loadDashboardStats();
+
+})();
+</script>
+</body>
+</html>

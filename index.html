@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Login to FoodieFix — Premium Restaurant Management System">
+    <title>FoodieFix — Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-brand">
+            <span class="logo-icon">🍽️</span>
+            <h1>FoodieFix</h1>
+            <p>Restaurant Management System</p>
+        </div>
+
+        <form id="login-form" autocomplete="off">
+            <div class="form-group">
+                <label for="login-username">Username</label>
+                <input type="text" id="login-username" class="form-control" placeholder="Enter your username" name="username" required />
+            </div>
+
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" class="form-control" placeholder="Enter your password" name="password" required />
+            </div>
+
+            <div id="login-error" class="alert alert-error"></div>
+
+            <button type="submit" id="login-btn" class="btn btn-primary btn-full">
+                Sign In
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account? <a href="register.html">Create one</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = 'https://foodiefix-backend-2.onrender.com';
+
+    if (localStorage.getItem('jwt_token')) {
+        window.location.href = 'dashboard.html';
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('login-username').value.trim();
+        const password = document.getElementById('login-password').value;
+        const errorDiv = document.getElementById('login-error');
+        const btn      = document.getElementById('login-btn');
+
+        errorDiv.classList.remove('show');
+
+        if (!username || !password) {
+            errorDiv.textContent = 'Please fill in all fields.';
+            errorDiv.classList.add('show');
+            return;
+        }
+
+        btn.textContent = 'Signing in...';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch(API_BASE + '/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: username, password: password })
+            });
+
+            if (!res.ok) {
+                const data = await res.json().catch(function() { return {}; });
+                errorDiv.textContent = data.message || 'Invalid username or password.';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            const data = await res.json();
+
+            localStorage.setItem('jwt_token', data.token);
+            localStorage.setItem('user_username', data.username);
+            localStorage.setItem('user_role', data.role);
+            localStorage.setItem('user_fullName', data.fullName);
+
+            window.location.href = 'dashboard.html';
+
+        } catch (err) {
+            errorDiv.textContent = 'Cannot connect to server. Make sure backend is running on port 8080.';
+            errorDiv.classList.add('show');
+        } finally {
+            btn.textContent = 'Sign In';
+            btn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>
